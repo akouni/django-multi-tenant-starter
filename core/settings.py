@@ -19,11 +19,21 @@ ALLOWED_HOSTS = [
     ".localhost",
 ]
 
-# Add custom domain from env
+# Add custom domain from env (with wildcard for subdomains)
 _domain = os.environ.get('DOMAIN_NAME', '')
 if _domain and _domain not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(_domain)
     ALLOWED_HOSTS.append(f'.{_domain}')
+
+# Render.com hostname
+_render_host = os.environ.get('RENDER_EXTERNAL_HOSTNAME', '')
+if _render_host:
+    ALLOWED_HOSTS.append(_render_host)
+
+# Trust Cloudflare proxy headers
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
 
 
 # ==========================================
@@ -154,6 +164,7 @@ MIDDLEWARE = [
     "django_tenants.middleware.main.TenantMainMiddleware",
     "core.middleware.JazzminSettingsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.locale.LocaleMiddleware",
@@ -269,16 +280,30 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # DATABASE
 # ==========================================
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django_tenants.postgresql_backend",
-        "NAME": os.environ.get("POSTGRES_DB", "starter_db"),
-        "USER": os.environ.get("POSTGRES_USER", "starter_user"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "change_me"),
-        "HOST": os.environ.get("DB_HOST", "db"),
-        "PORT": os.environ.get("DB_PORT", "5432"),
+_database_url = os.environ.get("DATABASE_URL")
+
+if _database_url:
+    import dj_database_url
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=_database_url,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,
+        )
     }
-}
+    DATABASES["default"]["ENGINE"] = "django_tenants.postgresql_backend"
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django_tenants.postgresql_backend",
+            "NAME": os.environ.get("POSTGRES_DB", "starter_db"),
+            "USER": os.environ.get("POSTGRES_USER", "starter_user"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "change_me"),
+            "HOST": os.environ.get("DB_HOST", "db"),
+            "PORT": os.environ.get("DB_PORT", "5432"),
+        }
+    }
 
 DATABASE_ROUTERS = ["django_tenants.routers.TenantSyncRouter"]
 
@@ -351,7 +376,10 @@ STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+if not DEBUG:
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+else:
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -433,25 +461,39 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@localhost')
 # CACHE (Redis)
 # ==========================================
 
-_redis_host = os.environ.get('REDIS_HOST', 'redis')
-_redis_port = os.environ.get('REDIS_PORT', '6379')
+_redis_url = os.environ.get('REDIS_URL', '')
+_redis_host = os.environ.get('REDIS_HOST', '')
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": f"redis://{_redis_host}:{_redis_port}/1",
-        "KEY_PREFIX": "starter",
-        "TIMEOUT": 300,
-    },
-    'tenant': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': f'redis://{_redis_host}:{_redis_port}/2',
-        'KEY_PREFIX': 'tenant',
+if _redis_url:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": _redis_url,
+            "KEY_PREFIX": "starter",
+            "TIMEOUT": 300,
+        },
     }
-}
-
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_CACHE_ALIAS = "default"
+elif _redis_host:
+    _redis_port = os.environ.get('REDIS_PORT', '6379')
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": f"redis://{_redis_host}:{_redis_port}/1",
+            "KEY_PREFIX": "starter",
+            "TIMEOUT": 300,
+        },
+    }
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_CACHE_ALIAS = "default"
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
+    SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_AGE = 86400
 
 # ==========================================

@@ -57,3 +57,5 @@ pillow
 # ==========================================
 redis
 gunicorn
+dj-database-url
+whitenoise

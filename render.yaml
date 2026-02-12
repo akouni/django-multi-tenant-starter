@@ -1,0 +1,23 @@
+# Render.com Blueprint — one-click deploy
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: django-multi-tenant-starter
+    runtime: python
+    plan: free
+    buildCommand: ./render_build.sh
+    startCommand: gunicorn core.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.13.0"
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false  # Set manually — paste your Neon connection string
+      - key: DOMAIN_NAME
+        sync: false  # Set manually — your freedns or custom domain
+      - key: DJANGO_SETTINGS_MODULE
+        value: core.settings
