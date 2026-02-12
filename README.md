@@ -16,6 +16,7 @@ Each tenant gets its own PostgreSQL schema, ensuring complete data separation wh
 - **Role-based access** — hierarchical roles with granular permission flags
 - **Internationalization** — English and French with django-modeltranslation
 - **Docker-ready** — docker-compose setup with PostGIS, Redis, and Django
+- **Demo data included** — 3 tenants, 12 users, 15 locations across Switzerland
 
 ## Tech Stack
 
@@ -46,7 +47,8 @@ django-multi-tenant-starter/
 ├── public_apps/
 │   ├── customers/             # Tenant (Client/Domain) models + management
 │   │   └── management/commands/
-│   │       └── create_tenant.py
+│   │       ├── create_tenant.py
+│   │       └── create_demo_data.py
 │   └── main/                  # Public site views (home, about, contact)
 ├── tenant_apps/
 │   ├── users/                 # CustomUser, Role, UserProfile, Teams
@@ -81,9 +83,10 @@ cp .env.example .env
 # 3. Build and start
 docker-compose up --build
 
-# 4. Open in your browser
-# Public site:  http://localhost:8000
-# Public admin: http://localhost:8000/en/admin/
+# 4. Load demo data (in another terminal)
+docker-compose exec web python manage.py create_demo_data
+
+# 5. Open in your browser (see Demo Access below)
 ```
 
 The entrypoint script automatically:
@@ -111,29 +114,99 @@ sudo apt-get install gdal-bin libgdal-dev libgeos-dev libproj-dev
 cp .env.example .env
 # Edit .env with your PostgreSQL and Redis connection details
 
-# 5. Initialize the database
-#    (PostgreSQL must have PostGIS extension available)
+# 5. Generate and apply migrations
+python manage.py makemigrations customers main users geomap
 python manage.py migrate
 
-# 6. Create a superuser
-python manage.py createsuperuser
+# 6. Load demo data (creates superuser + 3 tenants + users + locations)
+python manage.py create_demo_data
 
 # 7. Run the development server
 python manage.py runserver
 ```
 
+## Demo Access
+
+> **All demo accounts use the same password: `demo1234!`**
+
+### Public Site
+
+| URL | Credentials |
+|-----|-------------|
+| http://localhost:8000 | Public landing page (no login required) |
+| http://localhost:8000/en/admin/ | Username: `admin` / Password: `demo1234!` |
+
+### Tenant: Acme Corporation
+
+| URL | Description |
+|-----|-------------|
+| http://acme.localhost:8000 | Tenant home (redirects to dashboard) |
+| http://acme.localhost:8000/en/admin/ | Tenant admin panel |
+| http://acme.localhost:8000/en/geomap/map/ | Interactive map (5 locations) |
+| http://acme.localhost:8000/en/users/ | User management |
+
+| Username | Role | Staff |
+|----------|------|-------|
+| `alice` | Admin | Yes (superuser) |
+| `marc` | Manager | Yes |
+| `julie` | Editor | No |
+| `thomas` | Viewer | No |
+| `sophie` | Member | No |
+
+### Tenant: Helvetia Tech
+
+| URL | Description |
+|-----|-------------|
+| http://helvetia.localhost:8000 | Tenant home |
+| http://helvetia.localhost:8000/en/admin/ | Tenant admin panel |
+| http://helvetia.localhost:8000/en/geomap/map/ | Interactive map (4 locations) |
+
+| Username | Role | Staff |
+|----------|------|-------|
+| `bruno` | Admin | Yes (superuser) |
+| `sarah` | Manager | Yes |
+| `david` | Editor | No |
+
+### Tenant: Geneva Digital
+
+| URL | Description |
+|-----|-------------|
+| http://geneva.localhost:8000 | Tenant home |
+| http://geneva.localhost:8000/en/admin/ | Tenant admin panel |
+| http://geneva.localhost:8000/en/geomap/map/ | Interactive map (6 locations) |
+
+| Username | Role | Staff |
+|----------|------|-------|
+| `claire` | Admin | Yes (superuser) |
+| `luca` | Manager | Yes |
+| `emma` | Editor | No |
+| `noah` | Member | No |
+
+### Demo Data Summary
+
+| | Acme Corporation | Helvetia Tech | Geneva Digital |
+|---|---|---|---|
+| Schema | `tenant_acme` | `tenant_helvetia` | `tenant_geneva` |
+| Domain | `acme.localhost` | `helvetia.localhost` | `geneva.localhost` |
+| City | Lausanne (VD) | Zurich (ZH) | Geneva (GE) |
+| Users | 5 | 3 | 4 |
+| Locations | 5 | 4 | 6 |
+| Teams | 2 | 1 | 2 |
+| Language | French | English | French |
+
+### GeoMap Locations
+
+All demo locations are real Swiss addresses with accurate GPS coordinates:
+
+- **Acme**: Lausanne HQ, Yverdon warehouse, Nestle (Vevey), SwissTech Convention Center, EPFL Innovation Park
+- **Helvetia**: Zurich HQ, Basel R&D lab, Roche (Basel), ETH Zurich
+- **Geneva**: Geneva lakefront office, CERN, Palexpo, Nyon warehouse, UN Geneva, WHO
+
 ## Creating a Tenant
 
-Use the management command to create a new tenant:
+Use the management command to create a new tenant manually:
 
 ```bash
-# With Docker
-docker-compose exec web python manage.py create_tenant \
-    --name "Acme Corp" \
-    --domain "acme.localhost" \
-    --email admin@acme.com
-
-# Locally
 python manage.py create_tenant \
     --name "Acme Corp" \
     --domain "acme.localhost" \
@@ -147,7 +220,13 @@ Options:
 - `--password` — Admin password (optional, auto-generated if omitted)
 - `--schema` — Custom schema name (optional, auto-generated from name)
 
-Then access the tenant at `http://acme.localhost:8000`.
+## Management Commands
+
+| Command | Description |
+|---------|-------------|
+| `create_demo_data` | Create 3 demo tenants with users, locations, teams |
+| `create_demo_data --flush` | Delete demo tenants and recreate from scratch |
+| `create_tenant` | Create a single tenant with admin user |
 
 ## Configuration
 
@@ -173,6 +252,15 @@ All settings are driven by environment variables. See `.env.example` for the ful
 4. **URL separation** — public and tenant schemas use different URL configurations (`public_urls.py` vs `tenant_urls.py`)
 5. **Admin separation** — two Jazzmin admin sites, one for each context
 
+```
+Request: http://acme.localhost:8000/en/admin/
+  → django-tenants looks up Domain where domain = "acme.localhost"
+  → Finds Client with schema_name = "tenant_acme"
+  → Sets PostgreSQL search_path to "tenant_acme"
+  → Uses tenant_urls.py → tenant_admin_site
+  → All queries now run against the tenant_acme schema
+```
+
 ## Apps Overview
 
 ### Public Apps
@@ -188,6 +276,24 @@ All settings are driven by environment variables. See `.env.example` for the ful
 |-----|-------------|
 | `users` | CustomUser, Role (with hierarchy), UserProfile, Team, UserInvitation, SignupCode, UserActivity |
 | `geomap` | Location (PostGIS PointField), LocationType, MapLayer — with DRF API and OpenLayers map |
+
+## Free Hosting Options
+
+To deploy this project for free or at minimal cost:
+
+| Platform | Free Tier | PostGIS | Notes |
+|----------|-----------|---------|-------|
+| [Railway](https://railway.app) | $5 credit/month | Yes | Best option — supports Docker, PostgreSQL with PostGIS, Redis. One-click deploy. |
+| [Render](https://render.com) | Free web service + free PostgreSQL | Partial | Free PostgreSQL expires after 90 days. PostGIS available on paid plans. |
+| [Fly.io](https://fly.io) | 3 shared VMs free | Yes (via Docker) | Deploy the Docker image directly. Requires `flyctl` CLI. |
+| [Koyeb](https://koyeb.com) | 1 free service | No built-in | Bring your own database (use Neon or Supabase for free PostGIS). |
+| [Neon](https://neon.tech) | Free PostgreSQL | Yes | Serverless PostgreSQL with PostGIS. Pairs well with any app host. |
+| [Supabase](https://supabase.com) | Free PostgreSQL | Yes | Full PostgreSQL with PostGIS. Use as external database. |
+
+**Recommended setup for a free demo:**
+1. Database: [Neon](https://neon.tech) (free PostgreSQL with PostGIS)
+2. App: [Railway](https://railway.app) or [Fly.io](https://fly.io) (Docker deploy)
+3. Cache: Railway includes Redis, or use the app without Redis (set `SESSION_ENGINE` to `django.contrib.sessions.backends.db`)
 
 ## License
 
