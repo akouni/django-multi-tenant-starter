@@ -277,23 +277,28 @@ Request: http://acme.localhost:8000/en/admin/
 | `users` | CustomUser, Role (with hierarchy), UserProfile, Team, UserInvitation, SignupCode, UserActivity |
 | `geomap` | Location (PostGIS PointField), LocationType, MapLayer — with DRF API and OpenLayers map |
 
-## Free Hosting Options
+## Hosting & Deployment
 
-To deploy this project for free or at minimal cost:
+### Production Hosting
+
+For production deployments, we recommend [Hostinger](https://hostinger.fr?REFERRALCODE=PL3PAULAKLFD) — affordable VPS plans with full root access, Docker support, and excellent performance for Django + PostgreSQL stacks.
+
+### Free Options (for testing & demos)
+
+If you want to try the project online before committing to a host:
 
 | Platform | Free Tier | PostGIS | Notes |
 |----------|-----------|---------|-------|
-| [Railway](https://railway.app) | $5 credit/month | Yes | Best option — supports Docker, PostgreSQL with PostGIS, Redis. One-click deploy. |
-| [Render](https://render.com) | Free web service + free PostgreSQL | Partial | Free PostgreSQL expires after 90 days. PostGIS available on paid plans. |
-| [Fly.io](https://fly.io) | 3 shared VMs free | Yes (via Docker) | Deploy the Docker image directly. Requires `flyctl` CLI. |
-| [Koyeb](https://koyeb.com) | 1 free service | No built-in | Bring your own database (use Neon or Supabase for free PostGIS). |
-| [Neon](https://neon.tech) | Free PostgreSQL | Yes | Serverless PostgreSQL with PostGIS. Pairs well with any app host. |
-| [Supabase](https://supabase.com) | Free PostgreSQL | Yes | Full PostgreSQL with PostGIS. Use as external database. |
+| [Railway](https://railway.app) | $5 credit/month | Yes | Supports Docker, PostgreSQL with PostGIS, Redis. |
+| [Render](https://render.com) | Free web service | Partial | Free PostgreSQL expires after 90 days. |
+| [Fly.io](https://fly.io) | 3 shared VMs | Yes (via Docker) | Deploy the Docker image directly. |
+| [Neon](https://neon.tech) | Free PostgreSQL | Yes | Serverless PostgreSQL with PostGIS. |
+| [Supabase](https://supabase.com) | Free PostgreSQL | Yes | Full PostgreSQL with PostGIS. |
 
-**Recommended setup for a free demo:**
+**Quick free demo setup:**
 1. Database: [Neon](https://neon.tech) (free PostgreSQL with PostGIS)
 2. App: [Railway](https://railway.app) or [Fly.io](https://fly.io) (Docker deploy)
-3. Cache: Railway includes Redis, or use the app without Redis (set `SESSION_ENGINE` to `django.contrib.sessions.backends.db`)
+3. Cache: Railway includes Redis, or skip Redis for demos (set `SESSION_ENGINE` to `django.contrib.sessions.backends.db`)
 
 ## License
 
