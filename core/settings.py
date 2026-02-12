@@ -280,9 +280,18 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # DATABASE
 # ==========================================
 
-_database_url = os.environ.get("DATABASE_URL")
+_database_url = os.environ.get("DATABASE_URL", "").strip()
 
+# Clean up common DATABASE_URL issues
 if _database_url:
+    # Remove channel_binding parameter (not supported by dj-database-url)
+    import re
+    _database_url = re.sub(r'[&?]channel_binding=[^&]*', '', _database_url)
+    # Ensure it starts with a valid scheme
+    if _database_url.startswith("postgres://"):
+        _database_url = _database_url.replace("postgres://", "postgresql://", 1)
+
+if _database_url and _database_url.startswith("postgresql://"):
     import dj_database_url
     DATABASES = {
         "default": dj_database_url.config(
@@ -500,8 +509,6 @@ SESSION_COOKIE_AGE = 86400
 # LOGGING
 # ==========================================
 
-os.makedirs(BASE_DIR / "logs", exist_ok=True)
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -514,15 +521,10 @@ LOGGING = {
     },
     "handlers": {
         "console": {"class": "logging.StreamHandler", "formatter": "simple"},
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": str(BASE_DIR / "logs" / "app.log"),
-            "formatter": "verbose",
-        },
     },
     "loggers": {
-        "clients": {"handlers": ["console", "file"], "level": "INFO", "propagate": True},
-        "core.routers": {"handlers": ["console", "file"], "level": "INFO", "propagate": True},
+        "clients": {"handlers": ["console"], "level": "INFO", "propagate": True},
+        "core.routers": {"handlers": ["console"], "level": "INFO", "propagate": True},
     },
 }
 
