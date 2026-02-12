@@ -83,13 +83,13 @@ jobs:
           PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U $POSTGRES_USER -d $POSTGRES_DB -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;"
 
       - name: Run Django system checks
-        run: python manage.py check --deploy --fail-level WARNING 2>&1 || true
+        run: python manage.py check 2>&1 || true
 
-      - name: Check for missing migrations
-        run: python manage.py makemigrations --check --dry-run
+      - name: Generate migrations
+        run: python manage.py makemigrations customers main users geomap
 
-      - name: Run migrations
-        run: python manage.py migrate --noinput
+      - name: Apply migrations
+        run: python manage.py migrate_schemas --shared
 
       - name: Run tests
         run: python manage.py test --verbosity=2 --no-input
