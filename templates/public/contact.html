@@ -1,0 +1,44 @@
+{% extends "front-base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Contact" %} - {{ tenant_name|default:"Starter" }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <h1 class="mb-4">{% trans "Contact Us" %}</h1>
+                <p class="text-muted mb-4">{% trans "Have a question? Send us a message and we'll get back to you." %}</p>
+
+                {% if success %}
+                <div class="alert alert-success">
+                    {% trans "Your message has been sent successfully. Thank you!" %}
+                </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label">{% trans "Name" %}</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">{% trans "Email" %}</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">{% trans "Subject" %}</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">{% trans "Message" %}</label>
+                        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">{% trans "Send Message" %}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

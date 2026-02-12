@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Dashboard" %} - {{ tenant_name }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">{% trans "Dashboard" %}</h2>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 rounded-3 p-3 me-3">
+                        <i class="bi bi-people fs-3 text-primary"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">{% trans "Total Users" %}</h6>
+                        <h3 class="mb-0">{{ total_users|default:"0" }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 rounded-3 p-3 me-3">
+                        <i class="bi bi-person-check fs-3 text-success"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">{% trans "Active Users" %}</h6>
+                        <h3 class="mb-0">{{ active_users|default:"0" }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="bg-info bg-opacity-10 rounded-3 p-3 me-3">
+                        <i class="bi bi-geo-alt fs-3 text-info"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">{% trans "GeoMap" %}</h6>
+                        <a href="{% url 'geomap:map' %}" class="text-decoration-none">{% trans "Open Map" %} &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0">{% trans "Quick Actions" %}</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'users:user_list' %}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-people me-2"></i> {% trans "Manage Users" %}
+                </a>
+                <a href="{% url 'geomap:map' %}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-geo-alt me-2"></i> {% trans "View Map" %}
+                </a>
+                <a href="{% url 'users:profile' %}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-person me-2"></i> {% trans "My Profile" %}
+                </a>
+                {% if user.is_staff %}
+                <a href="/admin/" class="list-group-item list-group-item-action">
+                    <i class="bi bi-gear me-2"></i> {% trans "Admin Panel" %}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0">{% trans "Tenant Info" %}</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless mb-0">
+                    <tr><th>{% trans "Tenant" %}</th><td>{{ tenant_name }}</td></tr>
+                    <tr><th>{% trans "Schema" %}</th><td><code>{{ tenant_schema }}</code></td></tr>
+                    <tr><th>{% trans "Type" %}</th><td>{{ tenant_type }}</td></tr>
+                    <tr><th>{% trans "Languages" %}</th><td>{{ tenant_languages|join:", " }}</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

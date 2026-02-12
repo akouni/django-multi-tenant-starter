@@ -1,0 +1,59 @@
+# ==========================================
+# CORE DJANGO
+# ==========================================
+Django>=5.2
+psycopg2-binary
+django-tenants
+
+# ==========================================
+# AUTHENTICATION & MFA
+# ==========================================
+django-allauth[mfa]>=65.0.0
+fido2>=1.1.3,<2.0.0
+qrcode
+cryptography>=42.0.0,<45.0.0
+
+# ==========================================
+# REST API
+# ==========================================
+djangorestframework
+djangorestframework-gis
+drf-spectacular
+django-filter
+
+# ==========================================
+# ADMIN & UI
+# ==========================================
+django-jazzmin
+django-tinymce
+django-colorfield
+django-widget-tweaks
+django-json-widget
+django-import-export
+
+# ==========================================
+# INTERNATIONALIZATION
+# ==========================================
+django-modeltranslation
+django-countries
+django-phonenumber-field
+phonenumbers
+
+# ==========================================
+# SECURITY
+# ==========================================
+django-csp
+django-cors-headers
+
+# ==========================================
+# STORAGE
+# ==========================================
+django-storages
+boto3
+pillow
+
+# ==========================================
+# INFRASTRUCTURE
+# ==========================================
+redis
+gunicorn

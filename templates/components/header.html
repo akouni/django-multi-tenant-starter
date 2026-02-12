@@ -1,0 +1,28 @@
+{% load i18n %}
+<header class="bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+    <div>
+        <h5 class="mb-0">{% block page_title %}{% trans "Dashboard" %}{% endblock %}</h5>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <!-- Language switcher -->
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-translate"></i> {{ LANGUAGE_CODE|upper }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                {% get_available_languages as languages %}
+                {% for lang_code, lang_name in languages %}
+                <li>
+                    <form action="{% url 'set_language' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="language" value="{{ lang_code }}">
+                        <button type="submit" class="dropdown-item {% if lang_code == LANGUAGE_CODE %}active{% endif %}">
+                            {{ lang_name }}
+                        </button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</header>

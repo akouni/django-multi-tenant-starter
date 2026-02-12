@@ -1,0 +1,80 @@
+{% extends "front-base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Home" %} - {{ tenant_name|default:"Starter" }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold">{% trans "Multi-Tenant Django Starter" %}</h1>
+                <p class="lead mt-3">{% trans "A production-ready boilerplate with PostgreSQL schema isolation, user management, and geographic mapping." %}</p>
+                <div class="mt-4">
+                    <a href="{% url 'main:contact' %}" class="btn btn-light btn-lg me-2">{% trans "Get Started" %}</a>
+                    <a href="{% url 'main:about' %}" class="btn btn-outline-light btn-lg">{% trans "Learn More" %}</a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="bi bi-grid-fill" style="font-size: 12rem; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">{% trans "Features" %}</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-building fs-1 text-primary mb-3"></i>
+                        <h5 class="card-title">{% trans "Multi-Tenant" %}</h5>
+                        <p class="card-text text-muted">{% trans "Complete data isolation using PostgreSQL schemas. Each tenant has its own database schema." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-people fs-1 text-primary mb-3"></i>
+                        <h5 class="card-title">{% trans "User Management" %}</h5>
+                        <p class="card-text text-muted">{% trans "Roles, permissions, invitations, signup codes, and MFA support with django-allauth." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-geo-alt fs-1 text-primary mb-3"></i>
+                        <h5 class="card-title">{% trans "GeoMap" %}</h5>
+                        <p class="card-text text-muted">{% trans "PostGIS-powered geographic mapping with OpenLayers, location types, and map layers." %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Tech Stack -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">{% trans "Built With" %}</h2>
+        <div class="row g-3 justify-content-center">
+            {% for tech in "Django,PostgreSQL,PostGIS,Bootstrap 5,django-tenants,django-allauth,DRF,Jazzmin"|make_list %}
+            {% endfor %}
+            <div class="col-auto"><span class="badge bg-dark fs-6 p-2">Django 5.2+</span></div>
+            <div class="col-auto"><span class="badge bg-dark fs-6 p-2">PostgreSQL + PostGIS</span></div>
+            <div class="col-auto"><span class="badge bg-dark fs-6 p-2">django-tenants</span></div>
+            <div class="col-auto"><span class="badge bg-dark fs-6 p-2">django-allauth + MFA</span></div>
+            <div class="col-auto"><span class="badge bg-dark fs-6 p-2">Django REST Framework</span></div>
+            <div class="col-auto"><span class="badge bg-dark fs-6 p-2">Bootstrap 5</span></div>
+            <div class="col-auto"><span class="badge bg-dark fs-6 p-2">Jazzmin Admin</span></div>
+            <div class="col-auto"><span class="badge bg-dark fs-6 p-2">Docker</span></div>
+        </div>
+    </div>
+</section>
+{% endblock %}

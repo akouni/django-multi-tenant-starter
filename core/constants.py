@@ -1,0 +1,173 @@
+# core/constants.py - Jazzmin configurations for multi-tenant system
+
+# ==========================================
+# JAZZMIN PUBLIC SCHEMA
+# ==========================================
+
+JAZZMIN_SETTINGS_PUBLIC = {
+    "site_title": "Starter Admin",
+    "site_header": "Starter",
+    "site_brand": "Starter",
+    "site_logo": "img/favicon.svg",
+    "login_logo": "img/favicon.svg",
+    "site_logo_classes": "img-fluid",
+    "site_icon": "img/favicon.svg",
+    "welcome_sign": "Welcome to Starter Administration",
+    "copyright": "Multi-Tenant Starter",
+    "search_model": ["auth.User", "customers.Client"],
+    "user_avatar": None,
+    "topmenu_links": [
+        {"name": "Dashboard", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "View Site", "url": "/", "new_window": True},
+    ],
+    "usermenu_links": [
+        {"model": "users.CustomUser"}
+    ],
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": ["sites"],
+    "hide_models": ["auth.permission", "contenttypes.contenttype"],
+    "order_with_respect_to": [
+        "customers",
+        "users",
+        "main",
+        "auth",
+    ],
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "CustomUser.user": "fas fa-user",
+        "auth.group": "fas fa-users",
+        "customers": "fas fa-building",
+        "customers.client": "fas fa-user-tie",
+        "customers.domain": "fas fa-globe",
+        "main": "fas fa-home",
+        "main.contactmessage": "fas fa-paper-plane",
+    },
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+    "related_modal_active": False,
+    "custom_css": None,
+    "custom_js": None,
+    "use_google_fonts_cdn": True,
+    "show_ui_builder": True,
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {
+        "customers.client": "vertical_tabs",
+    },
+    "language_chooser": True,
+}
+
+JAZZMIN_UI_TWEAKS_PUBLIC = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "#337e16",
+    "accent": "#709eae",
+    "navbar": "#337e16",
+    "no_navbar_border": False,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "#132a31",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": True,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "sandstone",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success",
+    },
+}
+
+# ==========================================
+# JAZZMIN TENANT SCHEMA
+# ==========================================
+
+JAZZMIN_SETTINGS_TENANT = {
+    "site_title": "Starter Admin",
+    "site_header": "My Starter",
+    "site_brand": "Starter",
+    "site_logo": "img/favicon.svg",
+    "login_logo": "img/favicon.svg",
+    "site_logo_classes": "img-fluid",
+    "site_icon": "img/favicon.svg",
+    "welcome_sign": "Welcome to your Starter space",
+    "copyright": "Powered by Multi-Tenant Starter",
+    "user_avatar": None,
+    "topmenu_links": [
+        {"name": "Dashboard", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "View Site", "url": "/", "new_window": True},
+    ],
+    "usermenu_links": [
+        {"name": "My Profile", "url": "/admin/auth/user/", "permissions": ["auth.change_user"]},
+    ],
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": ["sites", "sessions"],
+    "hide_models": ["auth.permission", "contenttypes.contenttype"],
+    "order_with_respect_to": [
+        "users",
+        "geomap",
+        "auth",
+    ],
+    "icons": {
+        "auth": "fas fa-user-cog",
+        "auth.user": "fas fa-user",
+        "auth.group": "fas fa-users",
+        "geomap": "fas fa-map-marked-alt",
+        "geomap.location": "fas fa-map-pin",
+        "geomap.locationtype": "fas fa-layer-group",
+        "geomap.maplayer": "fas fa-map",
+    },
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+    "related_modal_active": False,
+    "custom_css": "css/admin-tenant.css",
+    "custom_js": "js/admin-tenant.js",
+    "use_google_fonts_cdn": True,
+    "show_ui_builder": False,
+    "changeform_format": "horizontal_tabs",
+    "language_chooser": True,
+}
+
+JAZZMIN_UI_TWEAKS_TENANT = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "#337e16",
+    "accent": "#709eae",
+    "navbar": "#337e16",
+    "no_navbar_border": False,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "#132a31",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": True,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "sandstone",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success",
+    },
+}

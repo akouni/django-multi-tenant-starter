@@ -1,0 +1,49 @@
+{% load i18n static %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{% url 'main:home' %}">
+            <i class="bi bi-grid-fill me-1"></i> {{ tenant_name|default:"Starter" }}
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'main:home' %}">{% trans "Home" %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'main:about' %}">{% trans "About" %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'main:contact' %}">{% trans "Contact" %}</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <!-- Language switcher -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-translate"></i> {{ LANGUAGE_CODE|upper }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        {% get_available_languages as languages %}
+                        {% for lang_code, lang_name in languages %}
+                        <li>
+                            <form action="{% url 'set_language' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="language" value="{{ lang_code }}">
+                                <button type="submit" class="dropdown-item">{{ lang_name }}</button>
+                            </form>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/">{% trans "Admin" %}</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,11 @@
+/* Admin tenant custom styles */
+/* Referenced by Jazzmin JAZZMIN_SETTINGS_TENANT.custom_css */
+
+/* Slightly adjust admin for tenant context */
+.main-header .navbar {
+    font-size: 0.9rem;
+}
+
+.content-wrapper {
+    background-color: #f8f9fa;
+}

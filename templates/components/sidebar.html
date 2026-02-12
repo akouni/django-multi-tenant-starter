@@ -1,0 +1,40 @@
+{% load i18n %}
+<nav class="sidebar d-flex flex-column p-3" style="width: 250px;">
+    <a href="/" class="d-flex align-items-center mb-3 text-white text-decoration-none">
+        <i class="bi bi-grid-fill fs-4 me-2"></i>
+        <span class="fs-5 fw-bold">{{ tenant_name|default:"Starter" }}</span>
+    </a>
+    <hr class="text-white-50">
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+            <a href="{% url 'users:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="bi bi-speedometer2"></i> {% trans "Dashboard" %}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'users:user_list' %}" class="nav-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-people"></i> {% trans "Users" %}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'geomap:map' %}" class="nav-link {% if 'map' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-geo-alt"></i> {% trans "GeoMap" %}
+            </a>
+        </li>
+    </ul>
+    <hr class="text-white-50">
+    <div class="dropdown">
+        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle me-2"></i>
+            <strong>{{ user.get_short_name|default:user.username }}</strong>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+            <li><a class="dropdown-item" href="{% url 'users:profile' %}">{% trans "Profile" %}</a></li>
+            {% if user.is_staff %}
+            <li><a class="dropdown-item" href="/admin/">{% trans "Admin" %}</a></li>
+            {% endif %}
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'users:logout' %}">{% trans "Sign out" %}</a></li>
+        </ul>
+    </div>
+</nav>

@@ -1,0 +1,32 @@
+{% extends "front-base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "About" %} - {{ tenant_name|default:"Starter" }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 class="mb-4">{% trans "About" %}</h1>
+                <p class="lead">{% trans "This is a multi-tenant Django starter project designed to help you build SaaS applications quickly." %}</p>
+
+                <h3 class="mt-5">{% trans "Architecture" %}</h3>
+                <p>{% trans "The project uses PostgreSQL schema-based multi-tenancy via django-tenants. Each tenant gets its own isolated database schema while sharing the same PostgreSQL instance." %}</p>
+
+                <h3 class="mt-4">{% trans "Key Components" %}</h3>
+                <ul class="list-group list-group-flush mb-4">
+                    <li class="list-group-item"><strong>{% trans "Public Site" %}</strong> - {% trans "Landing page accessible to everyone" %}</li>
+                    <li class="list-group-item"><strong>{% trans "Tenant Dashboard" %}</strong> - {% trans "Isolated workspace per client" %}</li>
+                    <li class="list-group-item"><strong>{% trans "User Management" %}</strong> - {% trans "Roles, permissions, invitations, MFA" %}</li>
+                    <li class="list-group-item"><strong>{% trans "GeoMap" %}</strong> - {% trans "Geographic location management with PostGIS" %}</li>
+                    <li class="list-group-item"><strong>{% trans "Admin" %}</strong> - {% trans "Jazzmin-themed Django admin per tenant" %}</li>
+                    <li class="list-group-item"><strong>{% trans "i18n" %}</strong> - {% trans "Multi-language support per tenant" %}</li>
+                </ul>
+
+                <a href="{% url 'main:home' %}" class="btn btn-primary">{% trans "Back to Home" %}</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

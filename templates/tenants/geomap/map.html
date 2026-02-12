@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "GeoMap" %} - {{ tenant_name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@9.2.4/ol.css">
+<style>
+    #map { width: 100%; height: 70vh; border-radius: 8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-geo-alt"></i> {% trans "Map" %}</h2>
+    <div>
+        <select id="layerFilter" class="form-select form-select-sm d-inline-block" style="width: auto;">
+            <option value="">{% trans "All location types" %}</option>
+        </select>
+    </div>
+</div>
+
+<div id="map" class="shadow-sm mb-4"></div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">{% trans "Locations" %}</h5>
+    </div>
+    <div class="card-body">
+        <div id="locations-list">
+            <p class="text-muted">{% trans "Loading locations..." %}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/ol@9.2.4/dist/ol.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map
+    const map = new ol.Map({
+        target: 'map',
+        layers: [
+            new ol.layer.Tile({
+                source: new ol.source.OSM()
+            })
+        ],
+        view: new ol.View({
+            center: ol.proj.fromLonLat([6.14, 46.20]),
+            zoom: 8
+        })
+    });
+
+    // Vector layer for locations
+    const vectorSource = new ol.source.Vector();
+    const vectorLayer = new ol.layer.Vector({
+        source: vectorSource,
+        style: new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 8,
+                fill: new ol.style.Fill({ color: '#3388ff' }),
+                stroke: new ol.style.Stroke({ color: '#fff', width: 2 })
+            })
+        })
+    });
+    map.addLayer(vectorLayer);
+
+    // Fetch locations from API
+    fetch('/geomap/api/locations/?format=json')
+        .then(r => r.json())
+        .then(data => {
+            const results = data.results || data;
+            const listEl = document.getElementById('locations-list');
+            let html = '<table class="table table-hover"><thead><tr><th>Name</th><th>Type</th><th>City</th></tr></thead><tbody>';
+
+            results.forEach(loc => {
+                if (loc.point && loc.point.coordinates) {
+                    const coords = ol.proj.fromLonLat(loc.point.coordinates);
+                    const feature = new ol.Feature({
+                        geometry: new ol.geom.Point(coords),
+                        name: loc.name
+                    });
+                    vectorSource.addFeature(feature);
+                }
+                html += `<tr><td>${loc.name}</td><td>${loc.location_type_name || '-'}</td><td>${loc.city || '-'}</td></tr>`;
+            });
+
+            html += '</tbody></table>';
+            if (results.length === 0) html = '<p class="text-muted">No locations found.</p>';
+            listEl.innerHTML = html;
+
+            // Fit to extent if features exist
+            if (vectorSource.getFeatures().length > 0) {
+                map.getView().fit(vectorSource.getExtent(), { padding: [50, 50, 50, 50], maxZoom: 14 });
+            }
+        })
+        .catch(err => {
+            document.getElementById('locations-list').innerHTML = '<p class="text-danger">Error loading locations.</p>';
+        });
+
+    // Fetch location types for filter
+    fetch('/geomap/api/location-types/?format=json')
+        .then(r => r.json())
+        .then(data => {
+            const results = data.results || data;
+            const select = document.getElementById('layerFilter');
+            results.forEach(lt => {
+                const opt = document.createElement('option');
+                opt.value = lt.id;
+                opt.textContent = lt.name;
+                select.appendChild(opt);
+            });
+        });
+});
+</script>
+{% endblock %}

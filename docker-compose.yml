@@ -1,0 +1,72 @@
+services:
+
+  # =========================================================================
+  # POSTGRESQL + POSTGIS
+  # =========================================================================
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-starter_db}
+      POSTGRES_USER: ${POSTGRES_USER:-starter_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
+    ports:
+      - "5442:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-starter_user} -d ${POSTGRES_DB:-starter_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - starter
+
+  # =========================================================================
+  # REDIS
+  # =========================================================================
+  redis:
+    image: redis:8-bookworm
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    networks:
+      - starter
+
+  # =========================================================================
+  # DJANGO APPLICATION
+  # =========================================================================
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: /app/entrypoint.sh
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+    volumes:
+      - .:/app
+      - ./staticfiles:/app/staticfiles
+      - ./media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+      - "8000:8000"
+    networks:
+      - starter
+
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  starter:
+    driver: bridge

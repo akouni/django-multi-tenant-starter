@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ location.name }} - {% trans "GeoMap" %}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'geomap:map' %}">{% trans "Map" %}</a></li>
+        <li class="breadcrumb-item active">{{ location.name }}</li>
+    </ol>
+</nav>
+
+<div class="card">
+    <div class="card-header">
+        <h3>{{ location.name }}</h3>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table">
+                    <tr><th>{% trans "Type" %}</th><td>{{ location.location_type }}</td></tr>
+                    <tr><th>{% trans "Address" %}</th><td>{{ location.full_address|default:"-" }}</td></tr>
+                    <tr><th>{% trans "Coordinates" %}</th><td>{{ location.latitude }}, {{ location.longitude }}</td></tr>
+                    <tr><th>{% trans "Description" %}</th><td>{{ location.description|default:"-" }}</td></tr>
+                    <tr><th>{% trans "Created" %}</th><td>{{ location.created_at }}</td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <div id="detail-map" style="height: 300px; border-radius: 8px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@9.2.4/ol.css">
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/ol@9.2.4/dist/ol.js"></script>
+<script>
+{% if location.latitude and location.longitude %}
+document.addEventListener('DOMContentLoaded', function() {
+    const coords = ol.proj.fromLonLat([{{ location.longitude }}, {{ location.latitude }}]);
+    const map = new ol.Map({
+        target: 'detail-map',
+        layers: [new ol.layer.Tile({ source: new ol.source.OSM() })],
+        view: new ol.View({ center: coords, zoom: 14 })
+    });
+    const marker = new ol.Feature({ geometry: new ol.geom.Point(coords) });
+    marker.setStyle(new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 10, fill: new ol.style.Fill({ color: '#dc3545' }),
+            stroke: new ol.style.Stroke({ color: '#fff', width: 2 })
+        })
+    }));
+    const vectorLayer = new ol.layer.Vector({ source: new ol.source.Vector({ features: [marker] }) });
+    map.addLayer(vectorLayer);
+});
+{% endif %}
+</script>
+{% endblock %}

@@ -1,0 +1,44 @@
+/* Custom styles for Multi-Tenant Starter */
+
+/* Primary color override */
+:root {
+    --bs-primary: #337e16;
+    --bs-primary-rgb: 51, 126, 22;
+}
+
+/* Smooth transitions */
+a, .btn {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Card hover effect */
+.card.shadow-sm:hover {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+}
+
+/* Sidebar active state */
+.sidebar .nav-link.active {
+    border-left: 3px solid #fff;
+}
+
+/* Hero section */
+.bg-primary {
+    background: linear-gradient(135deg, #337e16 0%, #1a4a0a 100%) !important;
+}
+
+/* Badge styles */
+.badge {
+    font-weight: 500;
+}
+
+/* Table improvements */
+.table th {
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Form improvements */
+.form-control:focus {
+    border-color: #337e16;
+    box-shadow: 0 0 0 0.25rem rgba(51, 126, 22, 0.25);
+}

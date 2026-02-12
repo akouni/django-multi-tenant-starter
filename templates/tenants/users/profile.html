@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Profile" %} - {{ tenant_name }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-person"></i> {% trans "My Profile" %}</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if user.avatar %}
+                <img src="{{ user.avatar.url }}" class="rounded-circle mb-3" width="120" height="120" alt="Avatar">
+                {% else %}
+                <i class="bi bi-person-circle" style="font-size: 5rem; color: #ccc;"></i>
+                {% endif %}
+                <h4>{{ user.get_full_name|default:user.username }}</h4>
+                <p class="text-muted">{{ user.email }}</p>
+                {% if user.department %}<span class="badge bg-secondary">{{ user.department }}</span>{% endif %}
+                {% if user.job_title %}<span class="badge bg-info">{{ user.job_title }}</span>{% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{% trans "Profile Details" %}</h5>
+                <a href="{% url 'users:profile_edit' %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil"></i> {% trans "Edit" %}
+                </a>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr><th style="width:30%;">{% trans "Username" %}</th><td>{{ user.username }}</td></tr>
+                    <tr><th>{% trans "Email" %}</th><td>{{ user.email }}</td></tr>
+                    <tr><th>{% trans "Phone" %}</th><td>{{ user.phone|default:"-" }}</td></tr>
+                    <tr><th>{% trans "Member since" %}</th><td>{{ user.date_joined|date:"N j, Y" }}</td></tr>
+                    {% if profile %}
+                    <tr><th>{% trans "Bio" %}</th><td>{{ profile.bio|default:"-" }}</td></tr>
+                    <tr><th>{% trans "Location" %}</th><td>{{ profile.location|default:"-" }}</td></tr>
+                    <tr><th>{% trans "Language" %}</th><td>{{ profile.get_language_display_name }}</td></tr>
+                    <tr><th>{% trans "Timezone" %}</th><td>{{ profile.timezone }}</td></tr>
+                    {% if profile.role %}
+                    <tr><th>{% trans "Role" %}</th><td><span class="badge" style="background-color:{{ profile.role.color }}">{{ profile.role.name }}</span></td></tr>
+                    {% endif %}
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
